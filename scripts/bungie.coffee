@@ -6,8 +6,6 @@ DataHelper = require('./bungie-data-helper.coffee')
 dataHelper = new DataHelper
 
 module.exports = (robot) ->
-  dataHelper.fetchDefs()
-
   # executes when any text is directed at the bot
   robot.respond /(.*)/i, (res) ->
     array = res.match[1].split ' '
