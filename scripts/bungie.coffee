@@ -16,37 +16,52 @@ module.exports = (robot) ->
     input = []
     input.push el.trim() for el in array when (el.trim() isnt "")
 
-    unless input.length is 2 or input.length is 3
+    if input.length > 3
       message = "Something didn't look right... Read more about using the bot here:\nhttps://github.com/phillipspc/showoff/blob/master/README.md"
       sendError(robot, res, message)
       return
 
-    weaponInput = input[2]
-    xbox = ['xbox', 'xb1', 'xbox1', 'xboxone', 'xbox360', 'xb360', 'xbone']
-    playstation = ['playstation', 'ps', 'ps3', 'ps4', 'playstation3', 'playstation4']
-    noNetwork = false
-    sanitized = input[1].toLowerCase()
-    if sanitized in xbox
-      input[1] = 'xbox'
-    else if sanitized in playstation
-      input[1] = 'playstation'
-    else
-      noNetwork = true
-      weaponInput = input[1]
-#      message = "I didn't recognize the second input, try 'xbox' or 'playstation'. Read more about using the bot here:\nhttps://github.com/phillipspc/showoff/blob/master/README.md"
-#      sendError(robot, res, message)
-#      return
+    data = {}
 
-    # defaults to slack username
-    if input.length is 2 && !noNetwork
-      input.unshift(res.message.user.name)
-
-    unless weaponInput.toLowerCase() in ['primary', 'special', 'secondary', 'heavy']
+    # weapon slot should always be last input
+    el = input[input.length-1].toLowerCase()
+    weaponSlot = checkWeaponSlot(el)
+    if weaponSlot is null
       message = "Please use 'primary', 'special', or 'heavy' for the weapon slot. Read more about using the bot here:\nhttps://github.com/phillipspc/showoff/blob/master/README.md"
       sendError(robot, res, message)
       return
+    else
+      data['weaponSlot'] = weaponSlot
 
-    data = generateInputHash(input, noNetwork)
+    # interprets input based on length
+    # if 3 elements, assume: gamertag, network, weaponSlot
+    if input.length is 3
+      el = input[1].toLowerCase()
+      membershipType = checkNetwork(el)
+      if membershipType is '1'
+        # replaces underscores with spaces for xbox users
+        data['displayName'] = input[0].splt('_').join(' ')
+      else
+        data['displayName'] = input[0]
+    else if input.length is 2
+      el = input[0].toLowerCase()
+      membershipType = checkNetwork(el)
+      if membershipType is null
+        # assume first input was gamertag
+        data['displayName'] = input[0]
+      else
+        # assume gamertag not provided, use slack first name
+        data['displayName'] = res.message.user.profile.first_name
+      data['membershipType'] = membershipType
+    else if input.length is 1
+      # assume only weaponSlot was provided
+      data['membershipType'] = null
+      data['displayName'] = res.message.user.profile.first_name
+    else
+      # catch all, but should never happen...
+      message = "Something didn't look right... Read more about using the bot here:\nhttps://github.com/phillipspc/showoff/blob/master/README.md"
+      sendError(robot, res, message)
+      return
 
     tryPlayerId(res, data.membershipType, data.displayName, robot).then (player) ->
       getCharacterId(res, player.platform, player.membershipId, robot).then (characterId) ->
@@ -61,27 +76,26 @@ module.exports = (robot) ->
             robot.emit 'slack-attachment', payload
 
 
-# takes an input (array) and returns a hash
-generateInputHash = (input, noNetwork) ->
-  if noNetwork
-    weaponInput = input[1]
-    network = null
-  else
-    weaponInput = input[2]
-    network = if input[1] is 'xbox' then '1' else '2'
-  name = if network is '1' then input[0].split("_").join(" ") else input[0]
-  if weaponInput is 'primary'
-    wpnSlot = 1
-  else if weaponInput in ['special', 'secondary']
-    wpnSlot = 2
-  else
-    wpnSlot = 3
 
-  return {
-    membershipType: network,
-    displayName: name,
-    weaponSlot: wpnSlot
-  }
+checkNetwork = (network) ->
+  xbox = ['xbox', 'xb1', 'xbox1', 'xboxone', 'xbox360', 'xb360', 'xbone']
+  playstation = ['playstation', 'ps', 'ps3', 'ps4', 'playstation3', 'playstation4']
+  if network in xbox
+    return '1'
+  else if network in playstation
+    return '2'
+  else
+    return null
+
+checkWeaponSlot = (slot) ->
+  if slot is 'primary'
+    return 1
+  else if slot in ['special', 'secondary']
+    return 2
+  else if slot is 'heay'
+    return 3
+  else
+    return null
 
 # Sends error message as DM in slack
 sendError = (robot, res, message) ->
@@ -106,7 +120,7 @@ tryPlayerId = (res, membershipType, displayName, robot) ->
       getPlayerId(res, '2', displayName, robot)
     ]).then (results) ->
       if results[0] && results[1]
-        robot.send {room: res.message.user.name}, "Mutiple platforms found for: #{displayName}. use xbox or playstation"
+        robot.send {room: res.message.user.name}, "Mutiple platforms found for: #{displayName}. use \"xbox\" or \"playstation\""
         deferred.reject()
         return
       else if results[0]
@@ -160,6 +174,8 @@ getItemIdFromSummary = (bot, membershipType, playerId, characterId, weaponSlot) 
 
   makeRequest bot, endpoint, (response) ->
     data = response.data
+
+
     itemInstanceId = data.items[weaponSlot].itemId
     deferred.resolve(itemInstanceId)
 
