@@ -80,13 +80,14 @@ checkNetwork = (network) ->
   else
     return null
 
+# returns bucketHash associated with each weapon slot
 checkWeaponSlot = (slot) ->
   if slot is 'primary'
-    return 1
+    return '1498876634'
   else if slot in ['special', 'secondary']
-    return 2
+    return '2465295065'
   else if slot is 'heay'
-    return 3
+    return '953998645'
   else
     return null
 
@@ -170,9 +171,18 @@ getItemIdFromSummary = (bot, membershipType, playerId, characterId, weaponSlot) 
 
   makeRequest bot, endpoint, (response) ->
     data = response.data
+    items = data.items
 
+    matchesBucketHash = (object) ->
+      "#{object.bucketHash}" is weaponSlot
 
-    itemInstanceId = data.items[weaponSlot].itemId
+    item = items.filter(matchesBucketHash)
+    if item.length is 0
+      robot.send {room: bot.message.user.name}, "Something went wrong, couldn't find the requested item for this character."
+      deferred.reject()
+      return
+
+    itemInstanceId = item[0].itemId
     deferred.resolve(itemInstanceId)
 
   deferred.promise
