@@ -86,7 +86,7 @@ checkWeaponSlot = (slot) ->
     return '1498876634'
   else if slot in ['special', 'secondary']
     return '2465295065'
-  else if slot is 'heay'
+  else if slot is 'heavy'
     return '953998645'
   else
     return null
