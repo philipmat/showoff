@@ -37,22 +37,17 @@ module.exports = (robot) ->
     # if 3 elements, assume: gamertag, network, weaponSlot
     if input.length is 3
       el = input[1].toLowerCase()
-      membershipType = checkNetwork(el)
-      if membershipType is '1'
-        # replaces underscores with spaces for xbox users
-        data['displayName'] = input[0].splt('_').join(' ')
-      else
-        data['displayName'] = input[0]
+      data['membershipType'] = checkNetwork(el)
+      data['displayName'] = input[0]
     else if input.length is 2
       el = input[0].toLowerCase()
-      membershipType = checkNetwork(el)
-      if membershipType is null
+      data['membershipType'] = checkNetwork(el)
+      if data['membershipType'] is null
         # assume first input was gamertag
         data['displayName'] = input[0]
       else
         # assume gamertag not provided, use slack first name
         data['displayName'] = res.message.user.slack.profile.first_name
-      data['membershipType'] = membershipType
     else if input.length is 1
       # assume only weaponSlot was provided
       data['membershipType'] = null
@@ -103,6 +98,9 @@ sendError = (robot, res, message) ->
 
 tryPlayerId = (res, membershipType, displayName, robot) ->
   deferred = new Deferred()
+  # replaces underscores with spaces (for xbox)
+  # safe to call on PSN IDs because underscores are not allowed
+  displayName = displayName.split('_').join(' ')
 
   if membershipType
     networkName = if membershipType is '1' then 'xbox' else 'playstation'
