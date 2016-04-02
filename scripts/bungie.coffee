@@ -51,12 +51,12 @@ module.exports = (robot) ->
         data['displayName'] = input[0]
       else
         # assume gamertag not provided, use slack first name
-        data['displayName'] = res.message.user.profile.first_name
+        data['displayName'] = res.message.user.slack.profile.first_name
       data['membershipType'] = membershipType
     else if input.length is 1
       # assume only weaponSlot was provided
       data['membershipType'] = null
-      data['displayName'] = res.message.user.profile.first_name
+      data['displayName'] = res.message.user.slack.profile.first_name
     else
       # catch all, but should never happen...
       message = "Something didn't look right... Read more about using the bot here:\nhttps://github.com/phillipspc/showoff/blob/master/README.md"
