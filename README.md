@@ -5,7 +5,7 @@ This project was based heavily off of [slack-destiny-bot](https://github.com/cpr
 
 ### Usage
 
-Showoff only requires 3 inputs, directed at the bot (order does matter):  
+Showoff only requires at most 3 inputs, directed at the bot (order does matter):  
 * XBL/PSN gamertag
 * console network ("xbox" or "playstation")
 * weapon slot ("primary", "special", "heavy").  
@@ -13,18 +13,25 @@ Showoff only requires 3 inputs, directed at the bot (order does matter):
 The standard usage looks like this:  
 >@bot-name MyGamertag xbox primary  
 
-with a response looking like (active nodes in bold/italics):  
-![image](https://cloud.githubusercontent.com/assets/11082871/14023305/3dd0f81a-f1ba-11e5-8eff-e16da622eda4.png)  
+with a response looking like (active nodes in bold):  
+![image](https://cloud.githubusercontent.com/assets/11082871/14224924/604e45aa-f87c-11e5-9dbd-0c81fe46938c.png)  
 Showoff automatically looks at **your most recently played character** when grabbing the weapon data.
 
 ### Advanced Options
-If your slack **username** (not first/last name) is the same as your gamertag, you can omit this entirely.  
->@bot-name xbox special
+If your slack profile's **first name** (not username) matches your gamertag, you can omit this entirely.  
+>@bot-name xbox special  
+
+If you don't include a console network, showoff will automatically search both.
+>@bot-name MyGamertag heavy
+
+Note that if the gamertag exists on both networks, this will not work.  
+
+Combining these options, the bot will pull your slack first name, and search both networks for the specified weapon with a single input.
+>@bot-name primary
 
 ### Testing it out
-If you want to test out the bot before using it in a public channel, try sending it a direct message. You do not need "@bot-name" when you are messaging the bot directly, just the inputs. The bot will still default to using your slack username when only 2 inputs are sent in a direct message.
+If you want to test out the bot before using it in a public channel, try sending it a direct message. You do not need "@bot-name" when you are messaging the bot directly, just the inputs.
 
 ### Caveats
-* Xbox users must use an underscore ( _ ) for any spaces in their gamertags.
+* Xbox users must use an underscore ( _ ) for any spaces in their gamertag when inputting it directly. This is not necessary in the first name field of your slack profile; spaces will work fine.
 * As stated above, Showoff automatically looks at your most recently played character. This was ultimately an intentional decision to limit the number of inputs needed and simplify using the bot.
-* If you've recently equipped a new weapon, the bot may fail to retrieve the info properly. For best results, wait 10-15 seconds before using the bot.
