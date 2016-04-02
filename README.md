@@ -13,9 +13,9 @@ Showoff only requires 3 inputs, directed at the bot (order does matter):
 The standard usage looks like this:  
 >@bot-name MyGamertag xbox primary  
 
-with a response looking like:  
-![image](https://cloud.githubusercontent.com/assets/11082871/13578078/cebbf29e-e463-11e5-8e66-9971eb844c4f.png)  
-Showoff automatically looks at **your most recently played character** when grabbing the weapon data.  
+with a response looking like (active nodes in bold/italics):  
+![image](https://cloud.githubusercontent.com/assets/11082871/14023305/3dd0f81a-f1ba-11e5-8eff-e16da622eda4.png)  
+Showoff automatically looks at **your most recently played character** when grabbing the weapon data.
 
 ### Advanced Options
 If your slack **username** (not first/last name) is the same as your gamertag, you can omit this entirely.  
