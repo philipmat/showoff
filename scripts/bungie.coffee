@@ -97,12 +97,12 @@ sendError = (robot, res, message) ->
 
 tryPlayerId = (res, membershipType, displayName, robot) ->
   deferred = new Deferred()
-  # replaces underscores with spaces (for xbox)
-  # safe to call on PSN IDs because underscores are not allowed
-  displayName = displayName.split('_').join(' ')
 
   if membershipType
     networkName = if membershipType is '1' then 'xbox' else 'playstation'
+    # replaces underscores with spaces (for xbox)
+    displayName = displayName.split('_').join(' ') if networkName is 'xbox'
+    
     return getPlayerId(res, membershipType, displayName, robot)
     .then (results) ->
       if !results
@@ -113,7 +113,7 @@ tryPlayerId = (res, membershipType, displayName, robot) ->
       deferred.promise
   else
     return Q.all([
-      getPlayerId(res, '1', displayName, robot),
+      getPlayerId(res, '1', displayName.split('_').join(' '), robot),
       getPlayerId(res, '2', displayName, robot)
     ]).then (results) ->
       if results[0] && results[1]
