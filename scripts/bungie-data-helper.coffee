@@ -1,11 +1,11 @@
 request = require('request')
 
 class DataHelper
-  'fetchDefs': ->
-    @fetchStatDefs (error, response, body) =>
-      @statDefs = JSON.parse(body)
-    @fetchVendorDefs (error, response, body) =>
-      @vendorDefs = JSON.parse(body)
+  # 'fetchDefs': ->
+  #   @fetchStatDefs (error, response, body) =>
+  #     @statDefs = JSON.parse(body)
+  #   @fetchVendorDefs (error, response, body) =>
+  #     @vendorDefs = JSON.parse(body)
 
   'serializeFromApi': (response) ->
     damageColor =
@@ -33,8 +33,8 @@ class DataHelper
     nodeDefs: response.definitions.talentGrids[item.talentGridHash].nodes
     damageType: damageTypeName
 
-  'parseItemsForAttachment': (items) ->
-    items.map (item) => @parseItemAttachment(item)
+  # 'parseItemsForAttachment': (items) ->
+  #   items.map (item) => @parseItemAttachment(item)
 
   'parseItemAttachment': (item) ->
     name = "#{item.itemName}"
@@ -76,16 +76,16 @@ class DataHelper
     return orderedNodes
 
   # creates fields for perks and their descriptions
-  'buildFields': (nodes, nodeDefs) ->
-    displayNodes = nodes.map (node) ->
-      step = nodeDefs[node.nodeIndex].steps[node.stepIndex]
-      description = step.nodeStepDescription.replace(/(\r\n|\n|\r)/gm," ").replace("  "," ")
-
-      title: step.nodeStepName
-      value: description
-      short: true
-
-    displayNodes.filter (x) -> x
+  # 'buildFields': (nodes, nodeDefs) ->
+  #   displayNodes = nodes.map (node) ->
+  #     step = nodeDefs[node.nodeIndex].steps[node.stepIndex]
+  #     description = step.nodeStepDescription.replace(/(\r\n|\n|\r)/gm," ").replace("  "," ")
+  #
+  #     title: step.nodeStepName
+  #     value: description
+  #     short: true
+  #
+  #   displayNodes.filter (x) -> x
 
   'buildText': (nodes, nodeDefs) ->
     getName = (node) ->
@@ -98,27 +98,27 @@ class DataHelper
       column = nodeDefs[node.nodeIndex].column
       name = step.nodeStepName
       if node.isActivated
-        name = '_*' + step.nodeStepName + '*_'
+        name = "*#{step.nodeStepName}*"
       text[column] = "" unless text[column]
       text[column]+= name + " | "
 
     setText node for node in nodes
     return text
 
-  'fetchVendorDefs': (callback) ->
-    options =
-      method: 'GET'
-      url: 'http://destiny.plumbing/raw/mobileWorldContent/en/DestinyStatDefinition.json'
-      gzip: true
-
-    request(options, callback)
-
-  'fetchStatDefs': (callback) ->
-    options =
-      method: 'GET'
-      url: 'http://destiny.plumbing/raw/mobileWorldContent/en/DestinyStatDefinition.json'
-      gzip: true
-
-    request(options, callback)
+  # 'fetchVendorDefs': (callback) ->
+  #   options =
+  #     method: 'GET'
+  #     url: 'http://destiny.plumbing/raw/mobileWorldContent/en/DestinyStatDefinition.json'
+  #     gzip: true
+  #
+  #   request(options, callback)
+  #
+  # 'fetchStatDefs': (callback) ->
+  #   options =
+  #     method: 'GET'
+  #     url: 'http://destiny.plumbing/raw/mobileWorldContent/en/DestinyStatDefinition.json'
+  #     gzip: true
+  #
+  #   request(options, callback)
 
 module.exports = DataHelper
