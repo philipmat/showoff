@@ -17,7 +17,6 @@ class DataHelper
       damageTypeName = response.definitions.damageTypes[item.damageTypeHash].damageTypeName
     else
       damageTypeName = 'Kinetic'
-      console.log(Object.keys(response.definitions.damageTypes).length)
       console.log("damageType empty for #{itemDefs.itemName}")
 
     prefix = 'http://www.bungie.net'
