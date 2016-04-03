@@ -13,7 +13,7 @@ class DataHelper
     itemDefs = response.definitions.items[hash]
 
     # some weapons return an empty hash for definitions.damageTypes
-    if Object.keys(response.definitions.damageTypes).length is not 0
+    if Object.keys(response.definitions.damageTypes).length isnt 0
       damageTypeName = response.definitions.damageTypes[item.damageTypeHash].damageTypeName
     else
       damageTypeName = 'Kinetic'
