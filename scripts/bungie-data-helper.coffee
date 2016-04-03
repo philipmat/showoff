@@ -1,12 +1,6 @@
 request = require('request')
 
 class DataHelper
-  'fetchDefs': ->
-    @fetchStatDefs (error, response, body) =>
-      @statDefs = JSON.parse(body)
-    @fetchVendorDefs (error, response, body) =>
-      @vendorDefs = JSON.parse(body)
-
   'serializeFromApi': (response) ->
     damageColor =
       Kinetic: '#d9d9d9'
@@ -17,7 +11,13 @@ class DataHelper
     item = response.data.item
     hash = item.itemHash
     itemDefs = response.definitions.items[hash]
-    damageTypeName = response.definitions.damageTypes[item.damageTypeHash].damageTypeName
+
+    # some weapons return an empty hash for definitions.damageTypes
+    if Object.keys(response.definitions.damageTypes).length isnt 0
+      damageTypeName = response.definitions.damageTypes[item.damageTypeHash].damageTypeName
+    else
+      damageTypeName = 'Kinetic'
+      console.log("damageType empty for #{itemDefs.itemName}")
 
     prefix = 'http://www.bungie.net'
     iconSuffix = itemDefs.icon
@@ -26,15 +26,12 @@ class DataHelper
     itemName: itemDefs.itemName
     itemDescription: itemDefs.itemDescription
     itemTypeName: itemDefs.itemTypeName
-    color: damageColor[damageTypeName] or '#d9d9d9'
+    color: damageColor[damageTypeName]
     iconLink: prefix + iconSuffix
     itemLink: prefix + itemSuffix
     nodes: response.data.talentNodes
     nodeDefs: response.definitions.talentGrids[item.talentGridHash].nodes
     damageType: damageTypeName
-
-  'parseItemsForAttachment': (items) ->
-    items.map (item) => @parseItemAttachment(item)
 
   'parseItemAttachment': (item) ->
     name = "#{item.itemName}"
@@ -58,7 +55,7 @@ class DataHelper
     validNodes = []
     invalid = (node) ->
       name = nodeDefs[node.nodeIndex].steps[node.stepIndex].nodeStepName
-      skip = ["Upgrade Damage", "Void Damage", "Solar Damage", "Arc Damage", "Kinetic Damage"]
+      skip = ["Upgrade Damage", "Void Damage", "Solar Damage", "Arc Damage", "Kinetic Damage", "Ascend", "Reforge Ready"]
       node.stateId is "Invalid" or node.hidden is true or name in skip
 
     validNodes.push node for node in nodes when not invalid(node)
@@ -75,18 +72,6 @@ class DataHelper
       column++
     return orderedNodes
 
-  # creates fields for perks and their descriptions
-  'buildFields': (nodes, nodeDefs) ->
-    displayNodes = nodes.map (node) ->
-      step = nodeDefs[node.nodeIndex].steps[node.stepIndex]
-      description = step.nodeStepDescription.replace(/(\r\n|\n|\r)/gm," ").replace("  "," ")
-
-      title: step.nodeStepName
-      value: description
-      short: true
-
-    displayNodes.filter (x) -> x
-
   'buildText': (nodes, nodeDefs) ->
     getName = (node) ->
       step = nodeDefs[node.nodeIndex].steps[node.stepIndex]
@@ -98,27 +83,11 @@ class DataHelper
       column = nodeDefs[node.nodeIndex].column
       name = step.nodeStepName
       if node.isActivated
-        name = '_*' + step.nodeStepName + '*_'
+        name = "*#{step.nodeStepName}*"
       text[column] = "" unless text[column]
       text[column]+= name + " | "
 
     setText node for node in nodes
     return text
-
-  'fetchVendorDefs': (callback) ->
-    options =
-      method: 'GET'
-      url: 'http://destiny.plumbing/raw/mobileWorldContent/en/DestinyStatDefinition.json'
-      gzip: true
-
-    request(options, callback)
-
-  'fetchStatDefs': (callback) ->
-    options =
-      method: 'GET'
-      url: 'http://destiny.plumbing/raw/mobileWorldContent/en/DestinyStatDefinition.json'
-      gzip: true
-
-    request(options, callback)
 
 module.exports = DataHelper
