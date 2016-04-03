@@ -11,7 +11,13 @@ class DataHelper
     item = response.data.item
     hash = item.itemHash
     itemDefs = response.definitions.items[hash]
-    damageTypeName = response.definitions.damageTypes[item.damageTypeHash].damageTypeName
+
+    # some weapons return an empty hash for definitions.damageTypes
+    if Object.keys(response.definitions.damageTypes).length is not 0
+      damageTypeName = response.definitions.damageTypes[item.damageTypeHash].damageTypeName
+    else
+      damageTypeName = 'Kinetic'
+      console.log("damageType empty for #{itemDefs.itemName}")
 
     prefix = 'http://www.bungie.net'
     iconSuffix = itemDefs.icon
@@ -20,7 +26,7 @@ class DataHelper
     itemName: itemDefs.itemName
     itemDescription: itemDefs.itemDescription
     itemTypeName: itemDefs.itemTypeName
-    color: damageColor[damageTypeName] or '#d9d9d9'
+    color: damageColor[damageTypeName]
     iconLink: prefix + iconSuffix
     itemLink: prefix + itemSuffix
     nodes: response.data.talentNodes
@@ -49,7 +55,7 @@ class DataHelper
     validNodes = []
     invalid = (node) ->
       name = nodeDefs[node.nodeIndex].steps[node.stepIndex].nodeStepName
-      skip = ["Upgrade Damage", "Void Damage", "Solar Damage", "Arc Damage", "Kinetic Damage"]
+      skip = ["Upgrade Damage", "Void Damage", "Solar Damage", "Arc Damage", "Kinetic Damage", "Ascend", "Reforge Ready"]
       node.stateId is "Invalid" or node.hidden is true or name in skip
 
     validNodes.push node for node in nodes when not invalid(node)
