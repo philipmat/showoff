@@ -55,7 +55,7 @@ class DataHelper
     validNodes = []
     invalid = (node) ->
       name = nodeDefs[node.nodeIndex].steps[node.stepIndex].nodeStepName
-      skip = ["Upgrade Damage", "Void Damage", "Solar Damage", "Arc Damage", "Kinetic Damage", "Ascend"]
+      skip = ["Upgrade Damage", "Void Damage", "Solar Damage", "Arc Damage", "Kinetic Damage", "Ascend", "Reforge Ready"]
       node.stateId is "Invalid" or node.hidden is true or name in skip
 
     validNodes.push node for node in nodes when not invalid(node)
