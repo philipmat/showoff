@@ -1,7 +1,7 @@
-# Showoff
+# Showoff (aka Gunsmith Bot)
 
 Showoff is a slack bot based on the [hubot](https://hubot.github.com/) framework, designed to make it easy for users to show off their Destiny weapons in slack. The goal is to enable users to share weapon information with as few inputs as possible.  
-This project was based heavily off of [slack-destiny-bot](https://github.com/cprater/slack-destiny-bot) which served as an outstanding basis for me to implement my own functionality. I also recommend checking out that repo for instructions on setting up your own copy of the bot.
+This project was based heavily off of [slack-destiny-bot](https://github.com/cprater/slack-destiny-bot) which served as an outstanding basis for me to implement my own functionality.
 
 ### Usage
 
@@ -35,3 +35,13 @@ If you want to test out the bot before using it in a public channel, try sending
 ### Caveats
 * Xbox users must use an underscore ( _ ) for any spaces in their gamertag when inputting it directly. This is not necessary in the first name field of your slack profile; spaces will work fine.
 * As stated above, Showoff automatically looks at your most recently played character. This was ultimately an intentional decision to limit the number of inputs needed and simplify using the bot.
+
+### Setting up the bot in your own slack
+First clone the repo locally:
+> git clone git@github.com:phillipspc/showoff.git
+
+To deploy to heroku, cd into the newly created folder then follow the steps [here](https://github.com/slackhq/hubot-slack) under "Deploying to Heroku" (minus the part about creating a local hubot).  
+You'll also need to add your [Bungie Api Key](https://www.bungie.net/en-US/User/API) to the config variables: 
+> heroku config:set BUNGIE_API_KEY=your-key-here
+
+The free tier of a heroku server will go to sleep automatically when not used, and requires the server to sleep 8hrs each day. You may want to investigate [hubot-heroku-keepalive](https://github.com/hubot-scripts/hubot-heroku-keepalive) as a way of mitigating this.
