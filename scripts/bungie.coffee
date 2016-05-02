@@ -9,7 +9,7 @@ helpText = "Use the \"help\" command to learn about using the bot, or check out 
 module.exports = (robot) ->
   # executes when any text is directed at the bot
   robot.respond /(.*)/i, (res) ->
-    if res.match[1] is 'help'
+    if res.match[1].toLowerCase() is 'help'
       return
 
     array = res.match[1].split ' '
