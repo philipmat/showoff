@@ -8,6 +8,9 @@ dataHelper = new DataHelper
 module.exports = (robot) ->
   # executes when any text is directed at the bot
   robot.respond /(.*)/i, (res) ->
+    if res.match[1] is 'help'
+      return
+      
     array = res.match[1].split ' '
 
     # trims spaces and removes empty elements in array
