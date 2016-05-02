@@ -4,13 +4,14 @@ Q = require('q')
 DataHelper = require('./bungie-data-helper.coffee')
 
 dataHelper = new DataHelper
+helpText = "Use the \"help\" command to learn about using the bot, or check out the full readme here:\nhttps://github.com/phillipspc/showoff/blob/master/README.md"
 
 module.exports = (robot) ->
   # executes when any text is directed at the bot
   robot.respond /(.*)/i, (res) ->
     if res.match[1] is 'help'
       return
-      
+
     array = res.match[1].split ' '
 
     # trims spaces and removes empty elements in array
@@ -18,7 +19,7 @@ module.exports = (robot) ->
     input.push el.trim() for el in array when (el.trim() isnt "")
 
     if input.length > 3
-      message = "Something didn't look right... Read more about using the bot here:\nhttps://github.com/phillipspc/showoff/blob/master/README.md"
+      message = "Something didn't look right... #{helpText}"
       sendError(robot, res, message)
       return
 
@@ -28,7 +29,7 @@ module.exports = (robot) ->
     el = input[input.length-1].toLowerCase()
     weaponSlot = checkWeaponSlot(el)
     if weaponSlot is null
-      message = "Please use 'primary', 'special', or 'heavy' for the weapon slot. Read more about using the bot here:\nhttps://github.com/phillipspc/showoff/blob/master/README.md"
+      message = "Please use 'primary', 'special', or 'heavy' for the weapon slot. #{helpText}"
       sendError(robot, res, message)
       return
     else
@@ -55,7 +56,7 @@ module.exports = (robot) ->
       data['displayName'] = res.message.user.slack.profile.first_name
     else
       # catch all, but should never happen...
-      message = "Something didn't look right... Read more about using the bot here:\nhttps://github.com/phillipspc/showoff/blob/master/README.md"
+      message = "Something didn't look right... #{helpText}"
       sendError(robot, res, message)
       return
 
@@ -128,7 +129,7 @@ tryPlayerId = (res, membershipType, displayName, robot) ->
     return getPlayerId(res, membershipType, displayName, robot)
     .then (results) ->
       if !results
-        robot.send {room: res.message.user.name}, "Could not find guardian with name: #{displayName} on #{networkName}"
+        robot.send {room: res.message.user.name, "unfurl_media": false}, "Could not find guardian with name: #{displayName} on #{networkName}. #{helpText}"
         deferred.reject()
         return
       deferred.resolve({platform: membershipType, membershipId: results})
@@ -139,7 +140,7 @@ tryPlayerId = (res, membershipType, displayName, robot) ->
       getPlayerId(res, '2', displayName, robot)
     ]).then (results) ->
       if results[0] && results[1]
-        robot.send {room: res.message.user.name}, "Mutiple platforms found for: #{displayName}. use \"xbox\" or \"playstation\""
+        robot.send {room: res.message.user.name, "unfurl_media": false}, "Mutiple platforms found for: #{displayName}. use \"xbox\" or \"playstation\". #{helpText}"
         deferred.reject()
         return
       else if results[0]
@@ -147,7 +148,7 @@ tryPlayerId = (res, membershipType, displayName, robot) ->
       else if results[1]
         deferred.resolve({platform: '2', membershipId: results[1]})
       else
-        robot.send {room: res.message.user.name}, "Could not find guardian with name: #{displayName} on either platform"
+        robot.send {room: res.message.user.name, "unfurl_media": false}, "Could not find guardian with name: #{displayName} on either platform. #{helpText}"
         deferred.reject()
         return
       deferred.promise
@@ -174,7 +175,7 @@ getCharacterId = (bot, membershipType, playerId, robot) ->
 
   makeRequest bot, endpoint, (response) ->
     if !response
-      robot.send {room: bot.message.user.name}, "Something went wrong, no characters found for this user"
+      robot.send {room: bot.message.user.name, "unfurl_media": false}, "Something went wrong, no characters found for this user. #{helpText}"
       deferred.reject()
       return
 
@@ -200,7 +201,7 @@ getItemIdFromSummary = (bot, membershipType, playerId, characterId, weaponSlot) 
 
     item = items.filter(matchesBucketHash)
     if item.length is 0
-      robot.send {room: bot.message.user.name}, "Something went wrong, couldn't find the requested item for this character."
+      robot.send {room: bot.message.user.name, "unfurl_media": false}, "Something went wrong, couldn't find the requested item for this character. #{helpText}"
       deferred.reject()
       return
 
