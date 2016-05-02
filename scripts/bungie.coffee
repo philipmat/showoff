@@ -77,11 +77,10 @@ module.exports = (robot) ->
 
     payload =
       attachments: [{
-  			"title": "Using the Gunsmith Bot",
+        "title": "Using the Gunsmith Bot",
   			"title_link": "https://github.com/phillipspc/showoff/blob/master/README.md",
         "text": "In #gunsmith, you can show off your weapons by messaging the bot with your gamertag, network, and weapon slot, separated by spaces. The standard usage looks like this: \n```@gunsmithbot: MyGamerTag xbox primary```\nIf you've set up your slack profile so that your *first name* matches your gamertag, you can omit this:```@gunsmithbot: playstation special```\n If your gamertag only exists on one network, that can be omitted as well:```@gunsmithbot: heavy```\n The Gunsmith Bot will always look at the *most recently played character* on your account.\n *Special note to Xbox Users:*\n If your gamertag has any spaces in it, these will need to be substituted with underscores (\"_\") in order for the bot to recognize the input properly. This is only required when inputting the gamertag manually however; spaces are fine in your slack first name.#{admin_message}\n\n _Keep that thing oiled, guardian._",
-  			"mrkdwn_in": ["text"]
-      }]
+  			"mrkdwn_in": ["text"]}]
       channel: res.message.user.name
 
     robot.emit 'slack-attachment', payload
