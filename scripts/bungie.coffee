@@ -4,7 +4,7 @@ Q = require('q')
 DataHelper = require('./bungie-data-helper.coffee')
 
 dataHelper = new DataHelper
-helpText = "Use the \"help\" command to learn about using the bot, or check out the full readme here:\nhttps://github.com/phillipspc/showoff/blob/master/README.md"
+helpText = "Use the \"help\" command to learn about using the bot, or check out the full readme here: https://github.com/phillipspc/showoff/blob/master/README.md"
 
 module.exports = (robot) ->
   # executes when any text is directed at the bot
