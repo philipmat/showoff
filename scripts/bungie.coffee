@@ -68,6 +68,24 @@ module.exports = (robot) ->
 
             robot.emit 'slack-attachment', payload
 
+  robot.respond /help/i, (res) ->
+    admin = process.env.ADMIN_USERNAME
+    if admin
+      admin_message = "\nFeel free to message me (@#{admin}) with any other questions about the bot."
+    else
+      admin_message = ""
+
+    payload =
+      attachments: [{
+  			"title": "Using the Gunsmith Bot",
+  			"title_link": "https://github.com/phillipspc/showoff/blob/master/README.md",
+        "text": "In #gunsmith, you can show off your weapons by messaging the bot with your gamertag, network, and weapon slot, separated by spaces. The standard usage looks like this: \n```@gunsmithbot: MyGamerTag xbox primary```\nIf you've set up your slack profile so that your *first name* matches your gamertag, you can omit this:```@gunsmithbot: playstation special```\n If your gamertag only exists on one network, that can be omitted as well:```@gunsmithbot: heavy```\n The Gunsmith Bot will always look at the *most recently played character* on your account.\n *Special note to Xbox Users:*\n If your gamertag has any spaces in it, these will need to be substituted with underscores (\"_\") in order for the bot to recognize the input properly. This is only required when inputting the gamertag manually however; spaces are fine in your slack first name.#{admin_message}\n\n _Keep that thing oiled, guardian._",
+  			"mrkdwn_in": ["text"]
+      }]
+      channel: res.message.user.name
+
+    robot.emit 'slack-attachment', payload
+
 
 
 checkNetwork = (network) ->
@@ -102,7 +120,7 @@ tryPlayerId = (res, membershipType, displayName, robot) ->
     networkName = if membershipType is '1' then 'xbox' else 'playstation'
     # replaces underscores with spaces (for xbox)
     displayName = displayName.split('_').join(' ') if networkName is 'xbox'
-    
+
     return getPlayerId(res, membershipType, displayName, robot)
     .then (results) ->
       if !results
