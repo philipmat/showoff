@@ -1,9 +1,0 @@
-# for deploying to IBM Bluemix
-applications:
-- name: showoff
-  host: showoff
-  buildpack: https://github.com/jthomas/nodejs-v4-buildpack.git
-  command: ./bin/hubot --adapter slack
-  path: .
-  instances: 1
-  memory: 256M
