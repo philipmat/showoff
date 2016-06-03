@@ -91,6 +91,16 @@ module.exports = (robot) ->
 
     robot.emit 'slack-attachment', payload
 
+  robot.error (err, res) ->
+    admin = process.env.ADMIN_USERNAME
+    if res?
+      if admin?
+        robot.send {room: admin, "unfurl_media": false}, "uncaughtException error when processing message: #{res}"
+      else
+        robot.logger.error "uncaughtException error when processing message: #{res}"
+    else
+      robot.logger.error "uncaughtException error."
+
 
 
 checkNetwork = (network) ->
