@@ -73,36 +73,31 @@ module.exports = (robot) ->
             robot.emit 'slack-attachment', payload
 
   robot.respond /help/i, (res) ->
-    admin = process.env.ADMIN_USERNAME
-    if admin
-      admin_message = "\nFeel free to message me (@#{admin}) with any other questions about the bot."
-    else
-      admin_message = ""
+    sendHelp(robot, res)
 
-    attachment =
-      title: "Using the Gunsmith Bot"
-      title_link: "https://github.com/phillipspc/showoff/blob/master/README.md"
-      text: "In #gunsmith, you can show off your weapons by messaging the bot with your gamertag, network, and weapon slot, separated by spaces. The Gunsmith Bot will always look at the *most recently played character* on your account. The standard usage looks like this: \n```@gunsmithbot: MyGamerTag xbox primary```\nIf you've set up your slack profile so that your *first name* matches your gamertag, you can omit this:```@gunsmithbot: playstation special```\n If your gamertag only exists on one network, that can be omitted as well:```@gunsmithbot: heavy```\n *Special note to Xbox Users:*\n If your gamertag has any spaces in it, these will need to be substituted with underscores (\"_\") in order for the bot to recognize the input properly. This is only required when inputting the gamertag manually however; spaces are fine in your slack first name.#{admin_message}\n\n _Keep that thing oiled, guardian._"
-      mrkdwn_in: ["text"]
-      fallback: "In #gunsmith, you can show off your weapons by messaging the bot with your gamertag, network, and weapon slot, separated by spaces. The Gunsmith Bot will always look at the MOST RECENTLY PLAYED CHARACTER on your account. The standard usage looks like this: \n\"@gunsmithbot: MyGamerTag xbox primary\"\nIf you've set up your slack profile so that your FIRST NAME matches your gamertag, you can omit this: \"@gunsmithbot: playstation special\"\n If your gamertag only exists on one network, that can be omitted as well: \"@gunsmithbot: heavy\"\n SPECIAL NOTE TO XBOX USERS:\n If your gamertag has any spaces in it, these will need to be substituted with underscores (\"_\") in order for the bot to recognize the input properly. This is only required when inputting the gamertag manually however; spaces are fine in your slack first name.#{admin_message}\n\n Keep that thing oiled, guardian."
+  robot.respond /!help/i, (res) ->
+    sendHelp(robot, res)
 
-    payload =
-      message: res.message
-      attachments: attachment
-      # channel: res.message.user.name
 
-    robot.emit 'slack-attachment', payload
+sendHelp = (robot, res) ->
+  admin = process.env.ADMIN_USERNAME
+  if admin
+    admin_message = "\nFeel free to message me (@#{admin}) with any other questions about the bot."
+  else
+    admin_message = ""
 
-  # robot.error (err, res) ->
-  #   admin = process.env.ADMIN_USERNAME
-  #   if res?
-  #     if admin?
-  #       robot.send {room: admin, "unfurl_media": false}, "uncaughtException error when processing message: #{res}"
-  #     else
-  #       robot.logger.error "uncaughtException error when processing message: #{res}"
-  #   else
-  #     robot.logger.error "uncaughtException error."
+  attachment =
+    title: "Using the Gunsmith Bot"
+    title_link: "https://github.com/phillipspc/showoff/blob/master/README.md"
+    text: "In #gunsmith, you can show off your weapons by messaging the bot with your gamertag, network, and weapon slot, separated by spaces. The Gunsmith Bot will always look at the *most recently played character* on your account. The standard usage looks like this: \n```@gunsmithbot: MyGamerTag xbox primary```\nIf you've set up your slack profile so that your *first name* matches your gamertag, you can omit this:```@gunsmithbot: playstation special```\n If your gamertag only exists on one network, that can be omitted as well:```@gunsmithbot: heavy```\n *Special note to Xbox Users:*\n If your gamertag has any spaces in it, these will need to be substituted with underscores (\"_\") in order for the bot to recognize the input properly. This is only required when inputting the gamertag manually however; spaces are fine in your slack first name.#{admin_message}\n\n _Keep that thing oiled, guardian._"
+    mrkdwn_in: ["text"]
+    fallback: "In #gunsmith, you can show off your weapons by messaging the bot with your gamertag, network, and weapon slot, separated by spaces. The Gunsmith Bot will always look at the MOST RECENTLY PLAYED CHARACTER on your account. The standard usage looks like this: \n\"@gunsmithbot: MyGamerTag xbox primary\"\nIf you've set up your slack profile so that your FIRST NAME matches your gamertag, you can omit this: \"@gunsmithbot: playstation special\"\n If your gamertag only exists on one network, that can be omitted as well: \"@gunsmithbot: heavy\"\n SPECIAL NOTE TO XBOX USERS:\n If your gamertag has any spaces in it, these will need to be substituted with underscores (\"_\") in order for the bot to recognize the input properly. This is only required when inputting the gamertag manually however; spaces are fine in your slack first name.#{admin_message}\n\n Keep that thing oiled, guardian."
 
+  payload =
+    message: res.message
+    attachments: attachment
+
+  robot.emit 'slack-attachment', payload
 
 
 checkNetwork = (network) ->
