@@ -20,7 +20,7 @@ class DataHelper
       console.log(Object.keys(response.definitions.damageTypes).length)
       console.log("damageType empty for #{itemDefs.itemName}")
 
-    prefix = 'http://www.bungie.net'
+    prefix = 'https://www.bungie.net'
     iconSuffix = itemDefs.icon
     itemSuffix = '/en/Armory/Detail?item='+hash
 
