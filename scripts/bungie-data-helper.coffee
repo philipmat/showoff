@@ -74,15 +74,12 @@ class DataHelper
     name+= " [#{item.damageType}]" unless item.damageType is "Kinetic"
     filtered = @filterNodes(item.nodes, item.nodeDefs)
     textHash = @buildText(filtered, item.nodeDefs, item)
-    formattedText = for column, string of textHash
-      # removes trailing " | " from each line
-      string.slice(0, -3)
 
     fallback: item.itemDescription
     title: name
     title_link: item.itemLink
     color: item.color
-    text: formattedText.join('\n')
+    text: (string for column, string of textHash).join('\n')
     mrkdwn_in: ["text"]
     thumb_url: item.iconLink
 
@@ -121,7 +118,7 @@ class DataHelper
       if node.isActivated
         name = "*#{step.nodeStepName}*"
       text[column] = "" unless text[column]
-      text[column]+= name + " | "
+      text[column] += (if text[column] then '|' else '') + name
 
     setText node for node in nodes
     stats = []
