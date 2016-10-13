@@ -118,7 +118,7 @@ class DataHelper
       if node.isActivated
         name = "*#{step.nodeStepName}*"
       text[column] = "" unless text[column]
-      text[column] += (if text[column] then '|' else '') + name
+      text[column] += (if text[column] then ' | ' else '') + name
 
     setText node for node in nodes
     stats = []
