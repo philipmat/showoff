@@ -54,7 +54,8 @@ class DataHelper
       console.log(Object.keys(response.definitions.damageTypes).length)
       console.log("damageType empty for #{itemDefs.itemName}")
     stats = {}
-    for stat in item.stats
+    # for stat in item.stats
+    for statHash, stat of response.definitions.items[hash].stats
       if stat.statHash of statHashes
         stats[statHashes[stat.statHash]] = stat.value
 
