@@ -53,6 +53,10 @@ class DataHelper
       damageTypeName = 'Kinetic'
       console.log(Object.keys(response.definitions.damageTypes).length)
       console.log("damageType empty for #{itemDefs.itemName}")
+    stats = {}
+    for stat in item.stats
+      if stat.statHash of statHashes
+        stats[statHashes[stat.statHash]] = stat.value
 
     prefix = 'http://www.bungie.net'
     iconSuffix = itemDefs.icon
@@ -67,7 +71,7 @@ class DataHelper
     nodes: response.data.talentNodes
     nodeDefs: response.definitions.talentGrids[item.talentGridHash].nodes
     damageType: damageTypeName
-    stats: item.stats #TODO: maybe extract the stats here
+    stats: stats
 
   'parseItemAttachment': (item) ->
     name = "#{item.itemName}"
@@ -122,9 +126,8 @@ class DataHelper
 
     setText node for node in nodes
     stats = []
-    for stat in item.stats
-      if stat.statHash of statHashes
-        stats.push "#{statHashes[stat.statHash]} : #{stat.value}"
+    for statName, statValue of item.stats
+        stats.push "#{statName} : #{statValue}"
     text['Stats'] = stats.join ', '
     return text 
 
