@@ -2,9 +2,10 @@ require('dotenv').load()
 Deferred = require('promise.coffee').Deferred
 Q = require('q')
 DataHelper = require('./bungie-data-helper.coffee')
+constants = require('./bungie-constants.coffee')
 
 dataHelper = new DataHelper
-helpText = "Use the \"help\" command to learn about using the bot, or check out the full readme here: https://github.com/phillipspc/showoff/blob/master/README.md"
+helpText = "Use the \"help\" command to learn about using the bot, or check out the full README here: https://github.com/phillipspc/showoff/blob/master/README.md"
 
 module.exports = (robot) ->
   # executes when any text is directed at the bot
@@ -27,16 +28,18 @@ module.exports = (robot) ->
 
     # weapon slot should always be last input
     el = input[input.length-1].toLowerCase()
-    weaponSlot = checkWeaponSlot(el)
-    if weaponSlot is null
-      message = "Please use 'primary', 'special', or 'heavy' for the weapon slot. #{helpText}"
+    bucket = getBucket(el)
+    if bucket is null
+      message = """Please use 'primary', 'special', or 'heavy' for the weapon slot.
+                   'head', 'chest', 'arms', 'legs', or 'class' for the armor slot.
+                   #{helpText}"""
       sendError(robot, res, message)
       return
     else
-      data['weaponSlot'] = weaponSlot
+      data['bucket'] = bucket
 
     # interprets input based on length
-    # if 3 elements, assume: gamertag, network, weaponSlot
+    # if 3 elements, assume: gamertag, network, bucket
     if input.length is 3
       el = input[1].toLowerCase()
       data['membershipType'] = checkNetwork(el)
@@ -51,7 +54,7 @@ module.exports = (robot) ->
         # assume gamertag not provided, use slack first name
         data['displayName'] = res.message.user.slack.profile.first_name
     else if input.length is 1
-      # assume only weaponSlot was provided
+      # assume only bucket was provided
       data['membershipType'] = null
       data['displayName'] = res.message.user.slack.profile.first_name
     else
@@ -62,7 +65,7 @@ module.exports = (robot) ->
 
     tryPlayerId(res, data.membershipType, data.displayName, robot).then (player) ->
       getCharacterId(res, player.platform, player.membershipId, robot).then (characterId) ->
-        getItemIdFromSummary(res, player.platform, player.membershipId, characterId, data.weaponSlot).then (itemInstanceId) ->
+        getItemIdFromSummary(res, player.platform, player.membershipId, characterId, data.bucket, robot).then (itemInstanceId) ->
           getItemDetails(res, player.platform, player.membershipId, characterId, itemInstanceId).then (item) ->
             parsedItem = dataHelper.parseItemAttachment(item)
 
@@ -90,9 +93,9 @@ sendHelp = (robot, res) ->
   attachment =
     title: "Using the Gunsmith Bot"
     title_link: "https://github.com/phillipspc/showoff/blob/master/README.md"
-    text: "In #gunsmith, you can show off your weapons by messaging the bot with your gamertag, network, and weapon slot, separated by spaces. The Gunsmith Bot will always look at the *most recently played character* on your account. The standard usage looks like this: \n```@gunsmithbot: MyGamerTag xbox primary```\nIf you've set up your slack profile so that your *first name* matches your gamertag, you can omit this:```@gunsmithbot: playstation special```\n If your gamertag only exists on one network, that can be omitted as well:```@gunsmithbot: heavy```\n *Special note to Xbox Users:*\n If your gamertag has any spaces in it, these will need to be substituted with underscores (\"_\") in order for the bot to recognize the input properly. This is only required when inputting the gamertag manually however; spaces are fine in your slack first name.#{admin_message}\n\n _Keep that thing oiled, guardian._"
+    text: "In #gunsmith, you can show off your weapons or armor by messaging the bot with your gamertag, network, and weapon or armor slot, separated by spaces. The Gunsmith Bot will always look at the *most recently played character* on your account. The standard usage looks like this: \n```@gunsmithbot: MyGamerTag xbox primary```\nIf you've set up your slack profile so that your *first name* matches your gamertag, you can omit this:```@gunsmithbot: playstation special```\n If your gamertag only exists on one network, that can be omitted as well:```@gunsmithbot: class```\n *Special note to Xbox Users:*\n If your gamertag has any spaces in it, these will need to be substituted with underscores (\"_\") in order for the bot to recognize the input properly. This is only required when inputting the gamertag manually however; spaces are fine in your slack first name.#{admin_message}\n\n _Keep that thing oiled, guardian._"
     mrkdwn_in: ["text"]
-    fallback: "In #gunsmith, you can show off your weapons by messaging the bot with your gamertag, network, and weapon slot, separated by spaces. The Gunsmith Bot will always look at the MOST RECENTLY PLAYED CHARACTER on your account. The standard usage looks like this: \n\"@gunsmithbot: MyGamerTag xbox primary\"\nIf you've set up your slack profile so that your FIRST NAME matches your gamertag, you can omit this: \"@gunsmithbot: playstation special\"\n If your gamertag only exists on one network, that can be omitted as well: \"@gunsmithbot: heavy\"\n SPECIAL NOTE TO XBOX USERS:\n If your gamertag has any spaces in it, these will need to be substituted with underscores (\"_\") in order for the bot to recognize the input properly. This is only required when inputting the gamertag manually however; spaces are fine in your slack first name.#{admin_message}\n\n Keep that thing oiled, guardian."
+    fallback: "In #gunsmith, you can show off your weapons or armor by messaging the bot with your gamertag, network, and weapon or armor slot, separated by spaces. The Gunsmith Bot will always look at the MOST RECENTLY PLAYED CHARACTER on your account. The standard usage looks like this: \n\"@gunsmithbot: MyGamerTag xbox primary\"\nIf you've set up your slack profile so that your FIRST NAME matches your gamertag, you can omit this: \"@gunsmithbot: playstation special\"\n If your gamertag only exists on one network, that can be omitted as well: \"@gunsmithbot: class\"\n SPECIAL NOTE TO XBOX USERS:\n If your gamertag has any spaces in it, these will need to be substituted with underscores (\"_\") in order for the bot to recognize the input properly. This is only required when inputting the gamertag manually however; spaces are fine in your slack first name.#{admin_message}\n\n Keep that thing oiled, guardian."
 
   payload =
     message: res.message
@@ -111,16 +114,19 @@ checkNetwork = (network) ->
   else
     return null
 
-# returns bucketHash associated with each weapon slot
-checkWeaponSlot = (slot) ->
-  if slot is 'primary'
-    return '1498876634'
-  else if slot in ['special', 'secondary']
-    return '2465295065'
-  else if slot is 'heavy'
-    return '953998645'
-  else
-    return null
+# returns bucketHash associated with each weapon/armor slot
+getBucket = (slot) ->
+  switch slot
+    when 'primary' then constants.TYPES.PRIMARY_WEAPON
+    when 'special', 'secondary' then constants.TYPES.SPECIAL_WEAPON
+    when 'heavy' then constants.TYPES.HEAVY_WEAPON
+    when 'ghost' then constants.TYPES.GHOST
+    when 'head', 'helmet' then constants.TYPES.HEAD
+    when 'chest' then constants.TYPES.CHEST
+    when 'arm', 'arms', 'gloves', 'gauntlets' then constants.TYPES.ARMS
+    when 'leg', 'legs', 'boots', 'greaves' then constants.TYPES.LEGS
+    when 'class', 'mark', 'bond', 'cape', 'cloak' then constants.TYPES.CLASS_ITEMS
+    else null
 
 # Sends error message as DM in slack
 sendError = (robot, res, message) ->
@@ -195,8 +201,8 @@ getCharacterId = (bot, membershipType, playerId, robot) ->
 
   deferred.promise
 
-# Gets itemInstanceId from Inventory Summary based on weaponSlot
-getItemIdFromSummary = (bot, membershipType, playerId, characterId, weaponSlot) ->
+# Gets itemInstanceId from Inventory Summary based on bucket
+getItemIdFromSummary = (bot, membershipType, playerId, characterId, bucket, robot) ->
   deferred = new Deferred()
   endpoint = "#{membershipType}/Account/#{playerId}/Character/#{characterId}/Inventory/Summary"
 
@@ -205,7 +211,7 @@ getItemIdFromSummary = (bot, membershipType, playerId, characterId, weaponSlot) 
     items = data.items
 
     matchesBucketHash = (object) ->
-      "#{object.bucketHash}" is weaponSlot
+      "#{object.bucketHash}" is "#{bucket}"
 
     item = items.filter(matchesBucketHash)
     if item.length is 0
@@ -240,7 +246,7 @@ makeRequest = (bot, endpoint, callback, params) ->
   queryParams = if params then '?'+params else ''
   url = baseUrl+endpoint+trailing+queryParams
 
-  # console.log("making request: #{url}")
+  console.log("making request: #{url}")
 
   bot.http(url)
     .header('X-API-Key', BUNGIE_API_KEY)
