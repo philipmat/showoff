@@ -1,41 +1,7 @@
 request = require('request')
+constants = require('./bungie-constants.coffee')
 
 class DataHelper
-  statHashes = 
-    "2391494160": "Light" 
-    "2523465841": "Velocity" 
-    "2715839340": "Recoil direction" 
-    "2762071195": "Efficiency" 
-    "2837207746": "Speed" 
-    "2961396640": "Charge Rate" 
-    "2996146975": "Agility" 
-    "3017642079": "Boost" 
-    "3555269338": "Optics" 
-    "3597844532": "Precision Damage" 
-    "3614673599": "Blast Radius" 
-    "3871231066": "Magazine" 
-    "3897883278": "Defense" 
-    "3907551967": "Move speed" 
-    "3988418950": "ADS Speed" 
-    "4043523819": "Impact" 
-    "4188031367": "Reload" 
-    "4244567218": "Strength" 
-    "4284893193": "Rate of Fire" 
-    "144602215": "Intellect" 
-    "155624089": "Stability" 
-    "209426660": "Defense" 
-    "360359141": "Durability" 
-    "368428387": "Attack" 
-    "392767087": "Armor" 
-    "925767036": "Energy" 
-    "943549884": "Equip Speed" 
-    "1240592695": "Range" 
-    "1345609583": "Aim assistance" 
-    "1501155019": "Speed" 
-    "1735777505": "Discipline" 
-    "1931675084": "Inventory Size" 
-    "1943323491": "Recovery" 
-
   'serializeFromApi': (response) ->
     damageColor =
       Kinetic: '#d9d9d9'
@@ -56,6 +22,7 @@ class DataHelper
     stats = {}
     # for stat in item.stats
     itemStats = if item.damageType == 0 then item.stats else response.definitions.items[hash].stats
+    statHashes = constants.STAT_HASHES
     for statHash, stat of itemStats
       if stat.statHash of statHashes
         stats[statHashes[stat.statHash]] = stat.value
