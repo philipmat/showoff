@@ -80,6 +80,7 @@ class DataHelper
     name+= " [#{item.damageType}]" unless item.damageType is "Kinetic"
     filtered = @filterNodes(item.nodes, item.nodeDefs)
     textHash = @buildText(filtered, item.nodeDefs, item)
+    footerText = @buildFooter(item)
 
     fallback: item.itemDescription
     title: name
@@ -87,6 +88,7 @@ class DataHelper
     color: item.color
     text: (string for column, string of textHash).join('\n')
     mrkdwn_in: ["text"]
+    footer: footerText
     thumb_url: item.iconLink
 
   # removes invalid nodes, orders according to column attribute
@@ -127,10 +129,13 @@ class DataHelper
       text[column] += (if text[column] then ' | ' else '') + name
 
     setText node for node in nodes
+    return text 
+
+  # stats go in the footer
+  'buildFooter': (item) ->
     stats = []
     for statName, statValue of item.stats
-        stats.push "#{statName} : #{statValue}"
-    text['Stats'] = stats.join ', '
-    return text 
+        stats.push "#{statName}: #{statValue}"
+    stats.join ', '
 
 module.exports = DataHelper
