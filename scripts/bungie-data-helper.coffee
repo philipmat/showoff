@@ -127,7 +127,7 @@ class DataHelper
     setText node for node in nodes
     stats = []
     for statName, statValue of item.stats
-        stats.push "#{statName} : #{statValue}"
+        stats.push "#{statName}: #{statValue}"
     text['Stats'] = stats.join ', '
     return text 
 

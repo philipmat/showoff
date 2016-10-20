@@ -240,7 +240,7 @@ makeRequest = (bot, endpoint, callback, params) ->
   queryParams = if params then '?'+params else ''
   url = baseUrl+endpoint+trailing+queryParams
 
-  # console.log("making request: #{url}")
+  console.log("making request: #{url}")
 
   bot.http(url)
     .header('X-API-Key', BUNGIE_API_KEY)
