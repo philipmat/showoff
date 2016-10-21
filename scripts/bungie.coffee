@@ -69,8 +69,8 @@ module.exports = (robot) ->
             payload =
               message: res.message
               attachments: parsedItem
-            
-            console.log payload
+
+            # console.log payload
             robot.emit 'slack-attachment', payload
 
   robot.respond /help/i, (res) ->
