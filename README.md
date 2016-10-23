@@ -43,5 +43,3 @@ First clone the repo locally:
 To deploy to heroku, cd into the newly created folder then follow the steps [here](https://github.com/slackhq/hubot-slack) under "Deploying to Heroku" (minus the part about creating a local hubot).  
 You'll also need to add your [Bungie Api Key](https://www.bungie.net/en-US/User/API) to the config variables: 
 > heroku config:set BUNGIE_API_KEY=your-key-here
-
-The free tier of a heroku server will go to sleep automatically when not used, and requires the server to sleep 8hrs each day. You may want to investigate [hubot-heroku-keepalive](https://github.com/hubot-scripts/hubot-heroku-keepalive) as a way of mitigating this.

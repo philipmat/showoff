@@ -27,7 +27,7 @@ class DataHelper
       if stat.statHash of statHashes
         stats[statHashes[stat.statHash]] = stat.value
 
-    prefix = 'http://www.bungie.net'
+    prefix = 'https://www.bungie.net'
     iconSuffix = itemDefs.icon
     itemSuffix = '/en/Armory/Detail?item='+hash
 
