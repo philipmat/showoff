@@ -34,6 +34,7 @@ module.exports = (robot) ->
     el = input[input.length-1].toLowerCase()
     bucket = getBucket(el)
     if bucket is null
+      message = ""
       message += "Please use 'primary', 'special', or 'heavy' for the weapon slot.\n" if SHOW_WEAPONS
       message += "Please use 'head', 'chest', 'arms', 'legs', or 'class' for the armor slot.\n" if SHOW_ARMOR
       message += "\n#{helpText}"
