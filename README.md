@@ -8,7 +8,8 @@ This project was based heavily off of [slack-destiny-bot](https://github.com/cpr
 Showoff only requires at most 3 inputs, directed at the bot (order does matter):  
 * XBL/PSN gamertag
 * console network ("xbox" or "playstation")
-* weapon slot ("primary", "special", "heavy").  
+* weapon slot ("primary", "special", "heavy") or
+  armor slot ("head", "chest", "arms", "legs", "class")
 
 The standard usage looks like this:  
 >@bot-name MyGamertag xbox primary  
@@ -43,3 +44,12 @@ First clone the repo locally:
 To deploy to heroku, cd into the newly created folder then follow the steps [here](https://github.com/slackhq/hubot-slack) under "Deploying to Heroku" (minus the part about creating a local hubot).  
 You'll also need to add your [Bungie Api Key](https://www.bungie.net/en-US/User/API) to the config variables: 
 > heroku config:set BUNGIE_API_KEY=your-key-here
+
+By default, the bot can look up weapons and armor. To *restrict* the bot to only one of the two, 
+use the `SLOT_DISPLAY` config option:
+
+> heroku config:set SLOT_DISPLAY='armor'
+
+or 
+
+> heroku config:set SLOT_DISPLAY='weapons'
