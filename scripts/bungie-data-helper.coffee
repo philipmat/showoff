@@ -21,10 +21,16 @@ class DataHelper
       console.log("damageType empty for #{itemDefs.itemName}")
     stats = {}
     # for stat in item.stats
-    itemStats = if item.damageType == 0 then item.stats else response.definitions.items[hash].stats
+    itemStats = item.stats
+
+    if item.damageType isnt 0
+      # if it's a weapon, we'll extend base stats with those from definitions
+      itemStatHashes = ( "#{x.statHash}" for x in item.stats )
+      for h, s of response.definitions.items[hash].stats when h not in itemStatHashes
+        itemStats.push s
+  
     statHashes = constants.STAT_HASHES
-    for statHash, stat of itemStats
-      if stat.statHash of statHashes
+    for stat in itemStats when stat.statHash of statHashes
         stats[statHashes[stat.statHash]] = stat.value
 
     prefix = 'https://www.bungie.net'
