@@ -24,9 +24,16 @@ class DataHelper
     itemStats = item.stats
 
     if item.damageType isnt 0
-      # if it's a weapon, we'll extend base stats with those from definitions
-      itemStatHashes = ( "#{x.statHash}" for x in item.stats )
-      for h, s of response.definitions.items[hash].stats when h not in itemStatHashes
+      # if it's a weapon, we'll extend base stats with 
+
+      # to expand using all the hidden stats, use the code below
+      # itemStatHashes = ( "#{x.statHash}" for x in item.stats )
+      # for h, s of response.definitions.items[hash].stats when h not in itemStatHashes
+      #   itemStats.push s
+
+      # to expand using a smaller list, match against EXTENDED_WEAPON_STATS
+      for extHash in constants.EXTENDED_WEAPON_STATS
+        s = response.definitions.items[hash].stats[extHash]
         itemStats.push s
   
     statHashes = constants.STAT_HASHES
