@@ -1,13 +1,8 @@
 request = require('request')
-constants = require('./bungie-constants.coffee')
+constants = require('./showoff-constants.coffee')
 
 class DataHelper
   'serializeFromApi': (response) ->
-    damageColor =
-      Kinetic: '#d9d9d9'
-      Arc: '#80b3ff'
-      Solar: '#e68a00'
-      Void: '#400080'
     item = response.data.item
     hash = item.itemHash
     itemDefs = response.definitions.items[hash]
@@ -24,8 +19,6 @@ class DataHelper
     itemStats = item.stats
 
     if item.damageType isnt 0
-      # if it's a weapon, we'll extend base stats with 
-
       # to expand using all the hidden stats, use the code below
       # itemStatHashes = ( "#{x.statHash}" for x in item.stats )
       # for h, s of response.definitions.items[hash].stats when h not in itemStatHashes
@@ -35,7 +28,7 @@ class DataHelper
       for extHash in constants.EXTENDED_WEAPON_STATS
         s = response.definitions.items[hash].stats[extHash]
         itemStats.push s
-  
+
     statHashes = constants.STAT_HASHES
     for stat in itemStats when stat.statHash of statHashes
         stats[statHashes[stat.statHash]] = stat.value
@@ -47,7 +40,7 @@ class DataHelper
     itemName: itemDefs.itemName
     itemDescription: itemDefs.itemDescription
     itemTypeName: itemDefs.itemTypeName
-    color: damageColor[damageTypeName]
+    color: constants.DAMAGE_COLOR[damageTypeName]
     iconLink: prefix + iconSuffix
     itemLink: prefix + itemSuffix
     nodes: response.data.talentNodes
@@ -109,7 +102,7 @@ class DataHelper
       text[column] += (if text[column] then ' | ' else '') + name
 
     setText node for node in nodes
-    return text 
+    return text
 
   # stats go in the footer
   'buildFooter': (item) ->

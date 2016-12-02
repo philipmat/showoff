@@ -1,18 +1,19 @@
 # Showoff (aka Gunsmith Bot)
 
-Showoff is a slack bot based on the [hubot](https://hubot.github.com/) framework, designed to make it easy for users to show off their Destiny weapons in slack. The goal is to enable users to share weapon information with as few inputs as possible.  
-This project was based heavily off of [slack-destiny-bot](https://github.com/cprater/slack-destiny-bot) which served as an outstanding basis for me to implement my own functionality.
+Showoff is a slack bot based on the [hubot](https://hubot.github.com/) framework, designed to make it easy for users to show off their Destiny weapons **(and now armor!)** in slack. The goal is to enable users to share weapon information with as few inputs as possible.  
+This project was originally based off of [slack-destiny-bot](https://github.com/cprater/slack-destiny-bot).
 
 ### Usage
 
 Showoff only requires at most 3 inputs, directed at the bot (order does matter):  
 * XBL/PSN gamertag
 * console network ("xbox" or "playstation")
-* weapon slot ("primary", "special", "heavy") or
-  armor slot ("head", "chest", "arms", "legs", "class")
+* weapon slot ("primary", "special", "heavy")
+
+If armor is enabled, it can be shown with: "head", "chest", "arms", "legs", "class", "ghost".
 
 The standard usage looks like this:  
->@bot-name MyGamertag xbox primary  
+`@bot-name MyGamertag xbox primary`
 
 with a response looking like (active nodes in bold):  
 ![image](https://cloud.githubusercontent.com/assets/11082871/14224924/604e45aa-f87c-11e5-9dbd-0c81fe46938c.png)  
@@ -20,15 +21,15 @@ Showoff automatically looks at **your most recently played character** when grab
 
 ### Advanced Options
 If your slack profile's **first name** (not username) matches your gamertag, you can omit this entirely.  
->@bot-name xbox special  
+`@bot-name xbox special`  
 
-If you don't include a console network, showoff will automatically search both.
->@bot-name MyGamertag heavy
+If you don't include a console network, showoff will automatically search both.  
+`@bot-name MyGamertag heavy`
 
 Note that if the gamertag exists on both networks, this will not work.  
 
-Combining these options, the bot will pull your slack first name, and search both networks for the specified weapon with a single input.
->@bot-name primary
+Combining these options, the bot will pull your slack first name, and search both networks for the specified weapon with a single input.  
+`@bot-name primary`
 
 ### Testing it out
 If you want to test out the bot before using it in a public channel, try sending it a direct message. You do not need "@bot-name" when you are messaging the bot directly, just the inputs.
@@ -38,18 +39,22 @@ If you want to test out the bot before using it in a public channel, try sending
 * As stated above, Showoff automatically looks at your most recently played character. This was ultimately an intentional decision to limit the number of inputs needed and simplify using the bot.
 
 ### Setting up the bot in your own slack
-First clone the repo locally:
-> git clone git@github.com:phillipspc/showoff.git
+First clone the repo locally:  
+`git clone git@github.com:phillipspc/showoff.git`
 
-To deploy to heroku, cd into the newly created folder then follow the steps [here](https://github.com/slackhq/hubot-slack) under "Deploying to Heroku" (minus the part about creating a local hubot).  
-You'll also need to add your [Bungie Api Key](https://www.bungie.net/en-US/User/API) to the config variables: 
-> heroku config:set BUNGIE_API_KEY=your-key-here
+To deploy to heroku, `cd` into the newly created folder then follow these steps:
 
-By default, the bot can look up weapons and armor. To *restrict* the bot to only one of the two, 
-use the `SLOT_DISPLAY` config option:
+- Install [heroku toolbelt](https://toolbelt.heroku.com/) if you haven't already.
+- Activate the Hubot service on your ["Team Services"](http://my.slack.com/services/new/hubot) page inside Slack.
+- `heroku create my-company-slackbot`
+- `heroku addons:create rediscloud:30`
+- `git push heroku master`
 
-> heroku config:set SLOT_DISPLAY='armor'
+You'll need to add the following [config variables](https://devcenter.heroku.com/articles/config-vars) (easiest way is through the Heroku Dashboard). [Get a Bungie API key](https://www.bungie.net/en/Application)
 
-or 
+`HEROKU_URL=https://my-company-slackbot.herokuapp.com`  
+`HUBOT_SLACK_TOKEN=your-slack-token-here`  
+`BUNGIE_API_KEY=your-bungie-key-here`
 
-> heroku config:set SLOT_DISPLAY='weapons'
+By default, the bot can show weapons AND armor. To restrict to just weapons, use the variable:  
+`SHOW_ARMOR=false`

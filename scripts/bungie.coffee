@@ -2,14 +2,15 @@ require('dotenv').load()
 Deferred = require('promise.coffee').Deferred
 Q = require('q')
 DataHelper = require './bungie-data-helper.coffee'
-constants = require './bungie-constants.coffee'
+constants = require './showoff-constants.coffee'
 
 dataHelper = new DataHelper
 helpText = "Use the \"help\" command to learn about using the bot, or check out the full README here: https://github.com/phillipspc/showoff/blob/master/README.md"
 
-displaySettings = process.env.SLOT_DISPLAY || constants.DEFAULT_SETTINGS.SLOT_DISPLAY
-SHOW_ARMOR = (displaySettings.indexOf('armor') != -1)
-SHOW_WEAPONS = (displaySettings.indexOf('weapons') != -1)
+if process.env.SHOW_ARMOR && process.env.SHOW_ARMOR isnt 'true'
+  SHOW_ARMOR = false
+else
+  SHOW_ARMOR = true
 
 module.exports = (robot) ->
   # executes when any text is directed at the bot
@@ -34,8 +35,7 @@ module.exports = (robot) ->
     el = input[input.length-1].toLowerCase()
     bucket = getBucket(el)
     if bucket is null
-      message = ""
-      message += "Please use 'primary', 'special', or 'heavy' for the weapon slot.\n" if SHOW_WEAPONS
+      message = "Please use 'primary', 'special', or 'heavy' for the weapon slot.\n"
       message += "Please use 'head', 'chest', 'arms', 'legs', or 'class' for the armor slot.\n" if SHOW_ARMOR
       message += "\n#{helpText}"
       sendError(robot, res, message)
@@ -77,8 +77,7 @@ module.exports = (robot) ->
             payload =
               message: res.message
               attachments: parsedItem
-            
-            console.log payload
+
             robot.emit 'slack-attachment', payload
 
   robot.respond /help/i, (res) ->
@@ -94,33 +93,36 @@ sendHelp = (robot, res) ->
     admin_message = "\nFeel free to message me (@#{admin}) with any other questions about the bot."
   else
     admin_message = ""
-  showWhat = []
-  showWeapon = null
-  showArmor = null
-  if SHOW_WEAPONS
-    showWhat.push 'weapon'
-    showWeapon = 'primary'
+
+  # customizes help message depending on display options
   if SHOW_ARMOR
-    showWhat.push 'armor'
-    showArmor = 'helmet'
-  showText = showWhat.join ' or '
-  mdText = "In #gunsmith, you can show off your #{showText} by messaging the bot with your gamertag, network, and #{showText} slot, separated by spaces. 
-  The Gunsmith Bot will always look at the *most recently played character* on your account. 
-  The standard usage looks like this: \n```@gunsmithbot: MyGamerTag xbox #{showWeapon || showArmor}```\n
-  If you've set up your slack profile so that your *first name* matches your gamertag, you can omit this:```@gunsmithbot: playstation #{showWeapon || showArmor}```\n
-  If your gamertag only exists on one network, that can be omitted as well:```@gunsmithbot: #{showArmor || showWeapon}```\n
+    options = "weapon/armor"
+    example1 = "primary"
+    example2 = "helmet"
+    example3 = "special"
+  else
+    options = "weapon"
+    example1 = "primary"
+    example2 = "special"
+    example3 = "heavy"
+
+  mdText = "To show off your #{options}, message the bot with your gamertag, network, and #{options} slot, separated by spaces.
+  The bot will always look at the *most recently played character* on your account.
+  The standard usage looks like this: \n```@gunsmithbot: MyGamerTag xbox #{example1}```\n
+  If you've set up your slack profile so that your *first name* matches your gamertag, you can omit this:```@gunsmithbot: playstation #{example2}```\n
+  If your gamertag only exists on one network, that can be omitted as well:```@gunsmithbot: #{example3}```\n
   *Special note to Xbox Users:*\n If your gamertag has any spaces in it, these will need to be substituted with underscores (\"_\")
   in order for the bot to recognize the input properly.
-  This is only required when inputting the gamertag manually however; spaces are fine in your slack first name.#{admin_message}\n\n 
+  This is only required when inputting the gamertag manually however; spaces are fine in your slack first name.#{admin_message}\n\n
   _Keep that thing oiled, guardian._"
-  fallback = "In #gunsmith, you can show off your #{showText} by messaging the bot with your gamertag, network, and #{showText} slot, separated by spaces. 
-  The Gunsmith Bot will always look at the *most recently played character* on your account. 
-  The standard usage looks like this: \n\"@gunsmithbot: MyGamerTag xbox #{showWeapon || showArmor}\"\n
-  If you've set up your slack profile so that your FIRST NAME matches your gamertag, you can omit this:\"@gunsmithbot: playstation #{showWeapon || showArmor}\"\n
-  If your gamertag only exists on one network, that can be omitted as well: \"@gunsmithbot: #{showArmor || showWeapon}\"\n
+  fallback = "To show off your #{options}, message the bot with your gamertag, network, and #{options} slot, separated by spaces.
+  The bot will always look at the *most recently played character* on your account.
+  The standard usage looks like this: \n\"@gunsmithbot: MyGamerTag xbox #{example1}\"\n
+  If you've set up your slack profile so that your FIRST NAME matches your gamertag, you can omit this:\"@gunsmithbot: playstation #{example2}\"\n
+  If your gamertag only exists on one network, that can be omitted as well: \"@gunsmithbot: #{example3}\"\n
   SPECIAL NOTE TO XBOX USERS:\n If your gamertag has any spaces in it, these will need to be substituted with underscores (\"_\")
   in order for the bot to recognize the input properly.
-  This is only required when inputting the gamertag manually however; spaces are fine in your slack first name.#{admin_message}\n\n 
+  This is only required when inputting the gamertag manually however; spaces are fine in your slack first name.#{admin_message}\n\n
   Keep that thing oiled, guardian."
 
   attachment =
@@ -149,10 +151,10 @@ checkNetwork = (network) ->
 # returns bucketHash associated with each weapon/armor slot
 getBucket = (slot) ->
   switch slot
-    when 'primary' then constants.TYPES.PRIMARY_WEAPON if SHOW_WEAPONS
-    when 'special', 'secondary' then constants.TYPES.SPECIAL_WEAPON if SHOW_WEAPONS
-    when 'heavy' then constants.TYPES.HEAVY_WEAPON if SHOW_WEAPONS
-    when 'ghost' then constants.TYPES.GHOST if SHOW_WEAPONS
+    when 'primary' then constants.TYPES.PRIMARY_WEAPON
+    when 'special', 'secondary' then constants.TYPES.SPECIAL_WEAPON
+    when 'heavy' then constants.TYPES.HEAVY_WEAPON
+    when 'ghost' then constants.TYPES.GHOST if SHOW_ARMOR
     when 'head', 'helmet' then constants.TYPES.HEAD if SHOW_ARMOR
     when 'chest' then constants.TYPES.CHEST if SHOW_ARMOR
     when 'arm', 'arms', 'gloves', 'gauntlets' then constants.TYPES.ARMS if SHOW_ARMOR
@@ -199,7 +201,7 @@ tryPlayerId = (res, membershipType, displayName, robot) ->
         return
       deferred.promise
 
-# Gets general player information from a players gamertag
+# Gets general player information from a player's gamertag
 getPlayerId = (res, membershipType, displayName, robot) ->
   deferred = new Deferred()
   endpoint = "SearchDestinyPlayer/#{membershipType}/#{displayName}"
