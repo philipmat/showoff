@@ -16,7 +16,7 @@ The standard usage looks like this:
 `@bot-name MyGamertag xbox primary`
 
 with a response looking like (active nodes in bold):  
-![image](https://cloud.githubusercontent.com/assets/11082871/20840640/eb0f6e36-b87e-11e6-9646-06f1c7655e99.png)
+![image](https://cloud.githubusercontent.com/assets/11082871/20840640/eb0f6e36-b87e-11e6-9646-06f1c7655e99.png)  
 Showoff automatically looks at **your most recently played character** when grabbing the weapon data.
 
 ### Advanced Options
