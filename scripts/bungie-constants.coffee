@@ -43,5 +43,6 @@ module.exports =
       "1735777505": "Discipline" 
       "1931675084": "Inventory Size" 
       "1943323491": "Recovery" 
+    EXTENDED_WEAPON_STATS: [ "1345609583", "943549884" ]
     DEFAULT_SETTINGS:
       SLOT_DISPLAY: "armor,weapons"
