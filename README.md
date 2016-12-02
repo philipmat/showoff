@@ -16,7 +16,7 @@ The standard usage looks like this:
 `@bot-name MyGamertag xbox primary`
 
 with a response looking like (active nodes in bold):  
-![image](https://cloud.githubusercontent.com/assets/11082871/14224924/604e45aa-f87c-11e5-9dbd-0c81fe46938c.png)  
+![image](https://cloud.githubusercontent.com/assets/11082871/20840640/eb0f6e36-b87e-11e6-9646-06f1c7655e99.png)
 Showoff automatically looks at **your most recently played character** when grabbing the weapon data.
 
 ### Advanced Options
@@ -46,13 +46,13 @@ To deploy to heroku, `cd` into the newly created folder then follow these steps:
 
 - Install [heroku toolbelt](https://toolbelt.heroku.com/) if you haven't already.
 - Activate the Hubot service on your ["Team Services"](http://my.slack.com/services/new/hubot) page inside Slack.
-- `heroku create my-company-slackbot`
+- `heroku create my-new-slackbot`
 - `heroku addons:create rediscloud:30`
 - `git push heroku master`
 
 You'll need to add the following [config variables](https://devcenter.heroku.com/articles/config-vars) (easiest way is through the Heroku Dashboard). [Get a Bungie API key](https://www.bungie.net/en/Application)
 
-`HEROKU_URL=https://my-company-slackbot.herokuapp.com`  
+`HEROKU_URL=https://my-new-slackbot.herokuapp.com`  
 `HUBOT_SLACK_TOKEN=your-slack-token-here`  
 `BUNGIE_API_KEY=your-bungie-key-here`
 
